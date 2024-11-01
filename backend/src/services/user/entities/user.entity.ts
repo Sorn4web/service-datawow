@@ -19,11 +19,11 @@ export class User {
   full_name: string;
 
   @CreateDateColumn()
-  createDate: Date;
+  created_at: Date;
 
   @UpdateDateColumn()
-  lastUpdate: Date;
+  updated_at: Date;
 
   @DeleteDateColumn()
-  deleteDate: Date;
+  deleted_at: Date;
 }

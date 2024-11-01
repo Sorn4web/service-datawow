@@ -1,26 +1,57 @@
-import { Injectable } from '@nestjs/common';
-import { CreateAuthDto } from './dto/create-auth.dto';
-import { UpdateAuthDto } from './dto/update-auth.dto';
+import { Injectable, UnauthorizedException } from '@nestjs/common';
+import { UserService } from '../user/user.service';
+import { JwtService } from '@nestjs/jwt';
 
 @Injectable()
 export class AuthService {
-  create(createAuthDto: CreateAuthDto) {
-    return 'This action adds a new auth';
+  constructor(
+    private userService: UserService,
+    private jwtService: JwtService,
+  ) {}
+
+  async login(username: string) {
+    try {
+      const user = await this.userService.findOneByUsername(username);
+
+      if (!user) {
+        throw new UnauthorizedException('Invalid username');
+      }
+
+      delete user.updated_at;
+      delete user.deleted_at;
+
+      const jwtPayload = { ...user, id: user.id };
+
+      return {
+        id: user.id,
+        name: `${user.full_name}`,
+        success: true,
+        message: 'User logged in successfully',
+        token: await this.jwtService.signAsync(jwtPayload),
+      };
+    } catch (error) {
+      throw new UnauthorizedException(error.message);
+    }
   }
 
-  findAll() {
-    return `This action returns all auth`;
-  }
+  async getProfile(id: number) {
+    try {
+      const user = await this.userService.findOne(id);
 
-  findOne(id: number) {
-    return `This action returns a #${id} auth`;
-  }
+      if (!user) {
+        throw new UnauthorizedException('User not found');
+      }
 
-  update(id: number, updateAuthDto: UpdateAuthDto) {
-    return `This action updates a #${id} auth`;
-  }
+      delete user.updated_at;
+      delete user.deleted_at;
 
-  remove(id: number) {
-    return `This action removes a #${id} auth`;
+      return {
+        success: true,
+        message: 'User profile fetched successfully',
+        user,
+      };
+    } catch (error) {
+      throw new UnauthorizedException(error.message);
+    }
   }
 }
