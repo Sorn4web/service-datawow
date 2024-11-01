@@ -4,6 +4,8 @@ import { ConfigModule } from '@nestjs/config';
 import { UserModule } from './services/user/user.module';
 import { MasterCommunityModule } from './master/master-community/master-community.module';
 import { AuthModule } from './services/auth/auth.module';
+import { AppController } from './app.controller';
+import { AppService } from './app.service';
 
 @Module({
   imports: [
@@ -22,7 +24,7 @@ import { AuthModule } from './services/auth/auth.module';
     MasterCommunityModule,
     AuthModule,
   ],
-  controllers: [],
-  providers: [],
+  controllers: [AppController],
+  providers: [AppService],
 })
 export class AppModule {}
